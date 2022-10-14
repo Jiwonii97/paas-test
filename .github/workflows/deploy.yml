@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name : CloudFoundry push application with different directory
-        uses: brickendon/cloudfoundry@main
+        uses: jhunt/cf-push@main
         with:
           appdir:   '.'       # use the appdir option to select a specif folder where the cf app is stored
           api:      ${{ secrets.PAAS_TA_URL }}
