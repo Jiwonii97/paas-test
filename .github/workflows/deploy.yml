@@ -10,25 +10,21 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+  
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  deploy:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      - name: Connect CF API
-        run: cf api --skip-ssl-validation https://api.paas-ta.org
-        shell : bash
-
-      - name: Log In CF API
-        run: cf login -u ${{ secrets.PAAS_TA_USER }} -p ${{ secrets.PAAS_TA_PASSWORD }} -o ${{ secrets.PAAS_TA_OWNER }} -s ${{ secrets.PAAS_TA_SPACE }}
-
-      - name: Push Your Data Using Manifest
-        run: cf push
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name : CloudFoundry push application with different directory
+        uses: brickendon/cloudfoundry@main
+        with:
+          appdir:   '.'       # use the appdir option to select a specif folder where the cf app is stored
+          api:      ${{ secrets.PAAS_TA_URL }}
+          org:      ${{ secrets.PAAS_TA_ORG }}
+          space:    ${{ secrets.PAAS_TA_SPACE }}
+          username: ${{ secrets.PAAS_TA_USER }}
+          password: ${{ secrets.PAAS_TA_PASSWORD }}
+          manifest: manifest.yml
+          validate: true    
