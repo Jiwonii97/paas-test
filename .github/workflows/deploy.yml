@@ -5,7 +5,7 @@ name: Production Deploy CI
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
+  pull_request:
     branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
@@ -16,20 +16,19 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: Make Tar File
-        run: tar -cpvzf ./$GITHUB_SHA.tgz *
+      - name: Connect CF API
+        run: cf api --skip-ssl-validation https://api.paas-ta.org
         shell : bash
 
-      - name: Configure AWS credentials # AWS 자격 증명
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Log In CF API
+        run: cf login -u ${{ secrets.PAAS_TA_USER }} -p ${{ secrets.PAAS_TA_PASSWORD }} -o ${{ secrets.PAAS_TA_OWNER }} -s ${{ secrets.PAAS_TA_SPACE }}
+
+      - name: Push Your Data Using Manifest
+        run: cf push
