@@ -28,4 +28,3 @@ jobs:
           password: ${{ secrets.PAAS_TA_PASSWORD }}
           manifest: manifest.yml
           validate: true    
-          debug: cf start memorial_test
